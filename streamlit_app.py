@@ -1,3 +1,4 @@
+import pandas as pd
 import streamlit as st
 
 # Function to calculate grade points based on letter grade
@@ -15,6 +16,7 @@ def calculate_gpa(data):
     sum_points = 0
     total_credits = 0
     invalid_lines = []
+    course_data = []
 
     for line in lines:
         try:
@@ -31,37 +33,44 @@ def calculate_gpa(data):
             
             sum_points += grade_points * credit
             total_credits += credit
+            
+            # Append valid data to course_data
+            course_data.append({"Course Name": course, "Credit": credit, "Grade": grade})
         except Exception as e:
             invalid_lines.append(line)
     
     gpa = sum_points / total_credits if total_credits > 0 else 0.0
-    return gpa, invalid_lines, total_credits
+    return gpa, invalid_lines, total_credits, course_data
 
 # Streamlit App
 st.title("GPA Calculator")
 
 # Input section
 st.markdown("### Enter your course data:")
-st.text_area(
+user_input = st.text_area(
     "Input format: Ders Adı      Kredi     Harf Notu",
     placeholder="E.g.,\nDers Adi      Kredi     Harf Notu\nMAT 103       4         BA \nFIZ 101E      3         CC \n...",
-    height=300,
-    key="user_input"
+    height=300
 )
 
 if st.button("Calculate GPA"):
-    user_data = st.session_state.user_input
-
-    if not user_data.strip():
+    if not user_input.strip():
         st.error("Please enter some data!")
     else:
-        gpa, invalid_lines, total_credits = calculate_gpa(user_data)
+        gpa, invalid_lines, total_credits, course_data = calculate_gpa(user_input)
         
         # Display results
         st.markdown(f"### 📊 Results:")
         st.markdown(f"**Total Credits:** {total_credits}")
         st.markdown(f"**GPA:** {gpa:.2f}")
         
+        # Display input data as a table
+        if course_data:
+            df = pd.DataFrame(course_data)
+            st.markdown("### 📋 Input Data:")
+            st.table(df)
+        
+        # Display invalid lines if any
         if invalid_lines:
             st.error("Some lines could not be processed:")
             st.text("\n".join(invalid_lines))
