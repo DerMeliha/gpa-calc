@@ -110,3 +110,4 @@ if st.button("Calculate GPA"):
             st.error(f"Course info for {course_code_to_fetch} not found.")
     else:
         st.error("Please enter some data before pressing Calculate GPA.")
+# edit
