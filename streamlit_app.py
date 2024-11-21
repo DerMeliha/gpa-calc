@@ -18,10 +18,16 @@ def calculate_gpa(data):
 
     for line in lines:
         try:
-            # Split line into course name, credits, and grade
-            course, credit, grade = line.split(maxsplit=2)
+            # Use fixed-width splitting by columns
+            parts = line.split()
+            if len(parts) < 3:
+                raise ValueError("Invalid line format")
+            
+            course = " ".join(parts[:-2])  # Combine all but the last two columns as course name
+            credit = int(parts[-2])  # Second-to-last column is the credit
+            grade = parts[-1]  # Last column is the grade
+            
             grade_points = calculate_grade_points(grade)
-            credit = int(credit)
             
             sum_points += grade_points * credit
             total_credits += credit
