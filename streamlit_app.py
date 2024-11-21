@@ -74,27 +74,23 @@ if st.button("Calculate GPA"):
         st.markdown(f"<p style='font-size: 24px;'><strong>Total Credits Without FF:</strong> {credits_without_ff}</p>", unsafe_allow_html=True)
         st.markdown(f"<p style='font-size: 24px;'><strong>GPA:</strong> {gpa:.2f}</p>", unsafe_allow_html=True)
         
-        # Display input data as a table
+        # Highlight rows based on grades
         if course_data:
             df = pd.DataFrame(course_data)
             df.index = range(1, len(df) + 1)  # Set index to start from 1
             
-            # Use custom CSS for the table
-            st.markdown(
-                """
-                <style>
-                table {
-                    font-size: 18px;  /* Larger font for table */
-                }
-                th, td {
-                    padding: 10px;  /* Add padding for readability */
-                }
-                </style>
-                """,
-                unsafe_allow_html=True
-            )
+            # Style rows with FF grades in red and grades > BB in green
+            def highlight_rows(row):
+                if row["Grade"] == "FF":
+                    return ["background-color: red; color: white"] * len(row)
+                elif calculate_grade_points(row["Grade"]) > 3.0:
+                    return ["background-color: lightgreen; color: black"] * len(row)
+                else:
+                    return [""] * len(row)
+            
+            styled_table = df.style.apply(highlight_rows, axis=1)
             st.markdown("### 📋 Input Data (No Duplicates):")
-            st.table(df)
+            st.dataframe(styled_table)  # Display styled table
         
         # Display invalid lines if any
         if invalid_lines:
