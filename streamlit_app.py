@@ -79,18 +79,18 @@ if st.button("Calculate GPA"):
             df = pd.DataFrame(course_data)
             df.index = range(1, len(df) + 1)  # Set index to start from 1
             
-            # Style rows with FF grades in red and grades > BB in green
+            # Style rows with FF grades in semi-transparent red and grades > BB in semi-transparent green
             def highlight_rows(row):
                 if row["Grade"] == "FF":
-                    return ["background-color: red; color: white"] * len(row)
+                    return ["background-color: rgba(255, 0, 0, 0.5); color: black"] * len(row)
                 elif calculate_grade_points(row["Grade"]) > 3.0:
-                    return ["background-color: lightgreen; color: black"] * len(row)
+                    return ["background-color: rgba(0, 255, 0, 0.5); color: black"] * len(row)
                 else:
                     return [""] * len(row)
             
             styled_table = df.style.apply(highlight_rows, axis=1)
             st.markdown("### 📋 Input Data (No Duplicates):")
-            st.dataframe(styled_table)  # Display styled table
+            st.dataframe(styled_table)  # Display styled table with original size
         
         # Display invalid lines if any
         if invalid_lines:
