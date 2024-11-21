@@ -24,10 +24,9 @@ def calculate_gpa(data):
     for line in lines:
         try:
             parts = line.split()
-            if len(parts) < 3:  # Make sure there are at least 3 parts
-                invalid_lines.append(line)
-                continue  # Skip this line if it's invalid
-
+            if len(parts) < 3:
+                raise ValueError("Invalid line format")
+            
             course = " ".join(parts[:-2])  # Combine all but the last two columns as course name
             credit = int(parts[-2])  # Second-to-last column is the credit
             grade = parts[-1]  # Last column is the grade
@@ -62,6 +61,63 @@ user_input = st.text_area(
     height=300
 )
 
+# Additional course data to display
+additional_courses = [
+    ["BIL 112E", 2, 1],
+    ["JEF 111", 2, 1],
+    ["MAT 103", 4, 1],
+    ["FIZ 101E", 3, 1],
+    ["FIZ 101EL", 1, 1],
+    ["ING 100", 3, 1],
+    ["TUR 121", 0, 1],
+    ["JEO 112E", 3, 1],
+    
+    ["KIM 101", 3, 2],
+    ["KIM 101EL", 1, 2],
+    ["JEO 121", 2, 2],
+    ["MAT 104", 4, 2],
+    ["FIZ 102E", 3, 2],
+    ["FIZ 102EL", 1, 2],
+    ["ING 112A", 2, 2],
+    ["DAN 102", 0, 2],
+    
+    ["MAT 210", 4, 3],
+    ["MEK 205", 3, 3],
+    ["MDN 271E", 3, 3],
+    ["JEF 207E", 2, 3],
+    ["ETK 101", 1, 3],
+    ["ING 201A", 2, 3],
+    
+    ["JEF 212E", 3, 4],
+    ["MDN 210", 3, 4],
+    ["MAT 202E", 3, 4],
+    ["TUR 122", 0, 4],
+    ["JEF 222", 3, 4],
+    ["JEF 208E", 2, 4],
+    
+    ["JEF 321", 3, 5],
+    ["JEF 325", 3, 5],
+    ["JEF 311E", 4, 5],
+    ["EKO 201", 3, 5],
+    
+    ["JEF 322", 3, 6],
+    ["JEF 334", 3, 6],
+    ["JEF 331", 3, 6],
+    ["JEO 315", 2, 6],
+    ["JEF 346", 3, 6],
+    ["ATA 121", 0, 6],
+    
+    ["JEF 451", 3, 7],
+    ["JEF 4901", 4, 7],
+    ["JEF 425", 3, 7],
+    ["JEO 222", 3, 7],
+    
+    ["ATA 122", 0, 8],
+    ["JEF 4902", 4, 8],
+    ["JEF 446E", 3, 8],
+]
+
+# Streamlit App Button and Calculation
 if st.button("Calculate GPA"):
     if not user_input.strip():
         st.error("Please enter some data!")
@@ -74,7 +130,7 @@ if st.button("Calculate GPA"):
         st.markdown(f"<p style='font-size: 24px;'><strong>Total Credits Without FF:</strong> {credits_without_ff}</p>", unsafe_allow_html=True)
         st.markdown(f"<p style='font-size: 24px;'><strong>GPA:</strong> {gpa:.2f}</p>", unsafe_allow_html=True)
         
-        # Prepare DataFrame
+        # Prepare DataFrame for input data
         if course_data:
             df = pd.DataFrame(course_data)
             df.index += 1  # Start index from 1
@@ -88,13 +144,21 @@ if st.button("Calculate GPA"):
                 else:
                     return ["background-color: transparent; color: white"] * len(row)
             
-            styled_df = df.style.apply(row_styles, axis=1).set_table_styles([{
-                'selector': 'table', 'props': [('width', '100%'), ('font-size', '16px')]}, {
-                'selector': 'th', 'props': [('text-align', 'center'), ('font-size', '18px')]}, {
-                'selector': 'td', 'props': [('text-align', 'center')]},])
+            styled_df = df.style.apply(row_styles, axis=1).set_table_styles([ 
+                {'selector': 'table', 'props': [('width', '100%'), ('font-size', '16px')]},
+                {'selector': 'th', 'props': [('text-align', 'center'), ('font-size', '18px')]},
+                {'selector': 'td', 'props': [('text-align', 'center')]},
+            ])
             
             st.markdown("### 📋 Input Data (No Duplicates):")
             st.write(styled_df.to_html(), unsafe_allow_html=True)  # Use HTML rendering for custom styles
+        
+        # Display additional courses table (provided)
+        additional_df = pd.DataFrame(additional_courses, columns=["Ders Kodu", "Kredi", "Not"])
+        additional_df["Ders Kodu"] = additional_df["Ders Kodu"].fillna("Seçmeli")  # Fill missing course names with 'Seçmeli'
+        additional_df.index += 1  # Start index from 1
+        st.markdown("### 📋 Additional Course Data:")
+        st.dataframe(additional_df)
         
         # Display invalid lines if any
         if invalid_lines:
