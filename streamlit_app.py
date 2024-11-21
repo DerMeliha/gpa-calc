@@ -15,6 +15,7 @@ def calculate_gpa(data):
     lines = data.strip().split('\n')[1:]  # Skip header row
     sum_points = 0
     total_credits = 0
+    valid_credits = 0
     invalid_lines = []
     course_data = []
 
@@ -32,15 +33,17 @@ def calculate_gpa(data):
             grade_points = calculate_grade_points(grade)
             
             sum_points += grade_points * credit
-            total_credits += credit
+            total_credits += credit  # Always count total credits
+            if grade != "FF":
+                valid_credits += credit  # Exclude FF credits
             
             # Append valid data to course_data
             course_data.append({"Course Name": course, "Credit": credit, "Grade": grade})
         except Exception as e:
             invalid_lines.append(line)
     
-    gpa = sum_points / total_credits if total_credits > 0 else 0.0
-    return gpa, invalid_lines, total_credits, course_data
+    gpa = sum_points / valid_credits if valid_credits > 0 else 0.0
+    return gpa, invalid_lines, valid_credits, course_data
 
 # Streamlit App
 st.title("GPA Calculator")
@@ -57,11 +60,11 @@ if st.button("Calculate GPA"):
     if not user_input.strip():
         st.error("Please enter some data!")
     else:
-        gpa, invalid_lines, total_credits, course_data = calculate_gpa(user_input)
+        gpa, invalid_lines, valid_credits, course_data = calculate_gpa(user_input)
         
         # Display results with larger font sizes
         st.markdown(f"<h2 style='font-size: 28px;'>📊 Results:</h2>", unsafe_allow_html=True)
-        st.markdown(f"<p style='font-size: 24px;'><strong>Total Credits:</strong> {total_credits}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='font-size: 24px;'><strong>Total Credits (Excluding FF):</strong> {valid_credits}</p>", unsafe_allow_html=True)
         st.markdown(f"<p style='font-size: 24px;'><strong>GPA:</strong> {gpa:.2f}</p>", unsafe_allow_html=True)
         
         # Display input data as a table
