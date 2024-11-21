@@ -79,22 +79,20 @@ if st.button("Calculate GPA"):
             df = pd.DataFrame(course_data)
             df.index = range(1, len(df) + 1)  # Set index to start from 1
             
-            # Style rows with FF grades in semi-transparent red and grades > BB in semi-transparent green
+            # Apply background colors for rows
             def highlight_rows(row):
-                style = ["color: white;"] * len(row)  # White text color for all cells
                 if row["Grade"] == "FF":
-                    return [f"background-color: rgba(255, 0, 0, 0.25);"] * len(row) + style
+                    return f"background-color: rgba(255, 0, 0, 0.25); color: white;"
                 elif calculate_grade_points(row["Grade"]) > 3.0:
-                    return [f"background-color: rgba(0, 255, 0, 0.25);"] * len(row) + style
-                else:
-                    return style
+                    return f"background-color: rgba(0, 255, 0, 0.25); color: white;"
+                return f"background-color: transparent; color: white;"
             
-            styled_table = df.style.apply(highlight_rows, axis=1).set_table_styles(
+            styled_table = df.style.applymap(highlight_rows).set_table_styles(
                 [{'selector': 'table', 'props': [('width', '100%')]}]  # Set table to be much wider
             )
             
             st.markdown("### 📋 Input Data (No Duplicates):")
-            st.dataframe(styled_table)  # Display styled table with modified width
+            st.write(styled_table.to_html(), unsafe_allow_html=True)  # Render table with custom styles as HTML
         
         # Display invalid lines if any
         if invalid_lines:
