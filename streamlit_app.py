@@ -45,10 +45,10 @@ def calculate_gpa(data):
 # Streamlit App
 st.title("GPA Calculator")
 
-# Input section
-st.markdown("### Enter your course data:")
+# Input section with larger font
+st.markdown("<h3>Enter your course data:</h3>", unsafe_allow_html=True)
 user_input = st.text_area(
-    "Input format: Ders Adı      Kredi     Harf Notu",
+    "",
     placeholder="E.g.,\nDers Adi      Kredi     Harf Notu\nMAT 103       4         BA \nFIZ 101E      3         CC \n...",
     height=300
 )
@@ -59,14 +59,30 @@ if st.button("Calculate GPA"):
     else:
         gpa, invalid_lines, total_credits, course_data = calculate_gpa(user_input)
         
-        # Display results
-        st.markdown(f"### 📊 Results:")
-        st.markdown(f"**Total Credits:** {total_credits}")
-        st.markdown(f"**GPA:** {gpa:.2f}")
+        # Display results with larger font sizes
+        st.markdown(f"<h2 style='font-size: 28px;'>📊 Results:</h2>", unsafe_allow_html=True)
+        st.markdown(f"<p style='font-size: 24px;'><strong>Total Credits:</strong> {total_credits}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='font-size: 24px;'><strong>GPA:</strong> {gpa:.2f}</p>", unsafe_allow_html=True)
         
         # Display input data as a table
         if course_data:
             df = pd.DataFrame(course_data)
+            df.index = range(1, len(df) + 1)  # Set index to start from 1
+            
+            # Use custom CSS for the table
+            st.markdown(
+                """
+                <style>
+                table {
+                    font-size: 18px;  /* Larger font for table */
+                }
+                th, td {
+                    padding: 10px;  /* Add padding for readability */
+                }
+                </style>
+                """,
+                unsafe_allow_html=True
+            )
             st.markdown("### 📋 Input Data:")
             st.table(df)
         
