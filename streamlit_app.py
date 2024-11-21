@@ -19,6 +19,8 @@ def calculate_gpa(data):
     invalid_lines = []
     course_data = []
 
+    seen_courses = set()  # To track duplicate courses
+
     for line in lines:
         try:
             # Use fixed-width splitting by columns
@@ -29,6 +31,10 @@ def calculate_gpa(data):
             course = " ".join(parts[:-2])  # Combine all but the last two columns as course name
             credit = int(parts[-2])  # Second-to-last column is the credit
             grade = parts[-1]  # Last column is the grade
+            
+            if course in seen_courses:
+                continue  # Skip duplicate courses
+            seen_courses.add(course)
             
             grade_points = calculate_grade_points(grade)
             
@@ -87,7 +93,7 @@ if st.button("Calculate GPA"):
                 """,
                 unsafe_allow_html=True
             )
-            st.markdown("### 📋 Input Data:")
+            st.markdown("### 📋 Input Data (No Duplicates):")
             st.table(df)
         
         # Display invalid lines if any
