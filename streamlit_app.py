@@ -24,9 +24,10 @@ def calculate_gpa(data):
     for line in lines:
         try:
             parts = line.split()
-            if len(parts) < 3:
-                raise ValueError("Invalid line format")
-            
+            if len(parts) < 3:  # Make sure there are at least 3 parts
+                invalid_lines.append(line)
+                continue  # Skip this line if it's invalid
+
             course = " ".join(parts[:-2])  # Combine all but the last two columns as course name
             credit = int(parts[-2])  # Second-to-last column is the credit
             grade = parts[-1]  # Last column is the grade
@@ -87,11 +88,10 @@ if st.button("Calculate GPA"):
                 else:
                     return ["background-color: transparent; color: white"] * len(row)
             
-            styled_df = df.style.apply(row_styles, axis=1).set_table_styles([
-                {'selector': 'table', 'props': [('width', '100%'), ('font-size', '16px')]},
-                {'selector': 'th', 'props': [('text-align', 'center'), ('font-size', '18px')]},
-                {'selector': 'td', 'props': [('text-align', 'center')]}
-            ])
+            styled_df = df.style.apply(row_styles, axis=1).set_table_styles([{
+                'selector': 'table', 'props': [('width', '100%'), ('font-size', '16px')]}, {
+                'selector': 'th', 'props': [('text-align', 'center'), ('font-size', '18px')]}, {
+                'selector': 'td', 'props': [('text-align', 'center')]},])
             
             st.markdown("### 📋 Input Data (No Duplicates):")
             st.write(styled_df.to_html(), unsafe_allow_html=True)  # Use HTML rendering for custom styles
