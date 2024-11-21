@@ -81,16 +81,20 @@ if st.button("Calculate GPA"):
             
             # Style rows with FF grades in semi-transparent red and grades > BB in semi-transparent green
             def highlight_rows(row):
+                style = ["color: white;"] * len(row)  # White text color for all cells
                 if row["Grade"] == "FF":
-                    return ["background-color: rgba(255, 0, 0, 0.5); color: black"] * len(row)
+                    return [f"background-color: rgba(255, 0, 0, 0.25);"] * len(row) + style
                 elif calculate_grade_points(row["Grade"]) > 3.0:
-                    return ["background-color: rgba(0, 255, 0, 0.5); color: black"] * len(row)
+                    return [f"background-color: rgba(0, 255, 0, 0.25);"] * len(row) + style
                 else:
-                    return [""] * len(row)
+                    return style
             
-            styled_table = df.style.apply(highlight_rows, axis=1)
+            styled_table = df.style.apply(highlight_rows, axis=1).set_table_styles(
+                [{'selector': 'table', 'props': [('width', '100%')]}]  # Set table to be much wider
+            )
+            
             st.markdown("### 📋 Input Data (No Duplicates):")
-            st.dataframe(styled_table)  # Display styled table with original size
+            st.dataframe(styled_table)  # Display styled table with modified width
         
         # Display invalid lines if any
         if invalid_lines:
