@@ -23,7 +23,6 @@ def calculate_gpa(data):
 
     for line in lines:
         try:
-            # Use fixed-width splitting by columns
             parts = line.split()
             if len(parts) < 3:
                 raise ValueError("Invalid line format")
@@ -54,7 +53,7 @@ def calculate_gpa(data):
 # Streamlit App
 st.title("GPA Calculator")
 
-# Input section with larger font
+# Input section
 st.markdown("<h3>Enter your course data:</h3>", unsafe_allow_html=True)
 user_input = st.text_area(
     "",
@@ -68,31 +67,34 @@ if st.button("Calculate GPA"):
     else:
         gpa, invalid_lines, total_credits, credits_without_ff, course_data = calculate_gpa(user_input)
         
-        # Display results with larger font sizes
+        # Display results
         st.markdown(f"<h2 style='font-size: 28px;'>📊 Results:</h2>", unsafe_allow_html=True)
         st.markdown(f"<p style='font-size: 24px;'><strong>Total Credits Given:</strong> {total_credits}</p>", unsafe_allow_html=True)
         st.markdown(f"<p style='font-size: 24px;'><strong>Total Credits Without FF:</strong> {credits_without_ff}</p>", unsafe_allow_html=True)
         st.markdown(f"<p style='font-size: 24px;'><strong>GPA:</strong> {gpa:.2f}</p>", unsafe_allow_html=True)
         
-        # Highlight rows based on grades
+        # Prepare DataFrame
         if course_data:
             df = pd.DataFrame(course_data)
-            df.index = range(1, len(df) + 1)  # Set index to start from 1
+            df.index += 1  # Start index from 1
             
-            # Apply background colors for rows
-            def highlight_rows(row):
+            # Highlighting rows directly within the DataFrame
+            def row_styles(row):
                 if row["Grade"] == "FF":
-                    return f"background-color: rgba(255, 0, 0, 0.25); color: white;"
+                    return ["background-color: rgba(255, 0, 0, 0.25); color: white"] * len(row)
                 elif calculate_grade_points(row["Grade"]) > 3.0:
-                    return f"background-color: rgba(0, 255, 0, 0.25); color: white;"
-                return f"background-color: transparent; color: white;"
+                    return ["background-color: rgba(0, 255, 0, 0.25); color: white"] * len(row)
+                else:
+                    return ["background-color: transparent; color: white"] * len(row)
             
-            styled_table = df.style.applymap(highlight_rows).set_table_styles(
-                [{'selector': 'table', 'props': [('width', '100%')]}]  # Set table to be much wider
-            )
+            styled_df = df.style.apply(row_styles, axis=1).set_table_styles([
+                {'selector': 'table', 'props': [('width', '100%'), ('font-size', '16px')]},
+                {'selector': 'th', 'props': [('text-align', 'center'), ('font-size', '18px')]},
+                {'selector': 'td', 'props': [('text-align', 'center')]}
+            ])
             
             st.markdown("### 📋 Input Data (No Duplicates):")
-            st.write(styled_table.to_html(), unsafe_allow_html=True)  # Render table with custom styles as HTML
+            st.write(styled_df.to_html(), unsafe_allow_html=True)  # Use HTML rendering for custom styles
         
         # Display invalid lines if any
         if invalid_lines:
